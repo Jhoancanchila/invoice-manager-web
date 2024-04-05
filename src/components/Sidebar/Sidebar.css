@@ -1,0 +1,149 @@
+.page.sidebar-page {
+  background: #17132a;
+}
+
+.sidebar {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 100%;
+  background: #3D3D3D;
+  transition: width 0.4s;
+  color: white;
+}
+.sidebar-title{
+  font-size: 25px;
+  font-weight: bold;
+  margin: 0 0 0 20px;
+}
+.sidebar.open {
+  width: 260px;
+}
+
+.sidebar .inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260px;
+}
+
+.sidebar header {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 6px;
+  background: rgb(0 0 0 / 25%);
+}
+.sidebar-content-button{
+  width: 100%;
+  position: absolute;
+  bottom: 100px;
+  right: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-control {
+  position: absolute;
+  bottom: 100px;
+  right: 2px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: rgb(0 0 0 / 25%);
+
+  padding: 10px;
+}
+
+.sidebar-button{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 0 0 30px;
+}
+.sidebar-button.close{
+  padding: 0 0 0 15px;
+  margin: 0 0 30px 0;
+}
+.sidebar-button > p{
+  font-size: 20px;
+  margin: 0 0 0 20px;
+}
+.sidebar-control.contract {
+  transform: rotate(180deg);
+}
+
+.sidebar header > img {
+  height: 28px;
+}
+
+.sidebar nav {
+  position: relative;
+  display: grid;
+  padding: 30px 0 0 0;
+  gap: 2px;
+}
+
+.sidebar nav > button {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  height: 44px;
+  width: 44px;
+  font-size: 16px;
+  text-transform: capitalize;
+  line-height: 1;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: #f9f9f9;
+}
+
+.sidebar nav > button:hover {
+  background: rgb(0 0 0 / 30%);
+}
+
+.sidebar nav > div {
+  transition: 0.3s;
+}
+
+.sidebar.open :is(nav div, header > img) {
+  opacity: 1;
+}
+
+.sidebar.open nav > button {
+  width: 100%;
+}
+
+.sidebar-mobile{
+  height: 100px;
+  width: 100%;
+  display: none;
+  background: #3D3D3D;
+  border-bottom: 1px solid rgb(0 0 0 / 30%);
+  color: white;
+}
+.sidebar-mobile-content{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.sidebar-mobile-item:hover{
+  color: black;
+  cursor: pointer;
+}
+
+@media(width < 1024px){
+  .sidebar{
+    display: none;
+  }
+  .sidebar-mobile{
+    display: flex;
+  }
+}
