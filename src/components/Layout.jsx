@@ -3,7 +3,7 @@ import React,{ Fragment } from 'react'
 const Layout = ({ children }) => {
   return (
     <Fragment>
-      <div className="bg-[#E7E7E7]">
+      <div>
         {
           children
         }
