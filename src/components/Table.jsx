@@ -35,6 +35,7 @@ const Table = () => {
     
   };
 
+  //paginador
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     const indexOfLastItem = pageNumber * itemsPerPage;
@@ -54,6 +55,9 @@ const Table = () => {
 
   const newArrayTotalPage = arrayTotalPage();
 
+  //formatear fecha
+  const formatDate = ( date, locale, options ) => new Intl.DateTimeFormat(locale,options).format(date);
+
   useEffect(() => {
     fetchClient();
     fetchInvoices();
@@ -66,25 +70,25 @@ const Table = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" className="px-6 py-3">
-                # Invoice
+              # Invoice
             </th>
             <th scope="col" className="px-6 py-3">
-                Client
+              Client
             </th>
             <th scope="col" className="px-6 py-3">
-                Date
+              Date
             </th>
             <th scope="col" className="px-6 py-3">
-                Subtotal
+              Subtotal
             </th>
             <th scope="col" className="px-6 py-3">
-                Discount
+              Discount
             </th>
             <th scope="col" className="px-6 py-3">
-                Total
+              Total
             </th>
             <th scope="col" className="px-6 py-3">
-                Products
+              Products
             </th>
           </tr>
         </thead>
@@ -99,7 +103,7 @@ const Table = () => {
                   {clients.find(cli => cli.id === invoice.client_id)?.contact_name}
                 </td>
                 <td className="px-6 py-4">
-                  {invoice.created_date}
+                  {formatDate(new Date(invoice.created_date), "en",{dateStyle: "long"})}
                 </td>
                 <td className="px-6 py-4">
                   {invoice.subtotal}
@@ -120,7 +124,7 @@ const Table = () => {
           }
         </tbody>
       </table>
-      <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
+      <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4" aria-label="Table navigation">
         <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">Showing <span className="font-semibold text-gray-900 dark:text-white">{(currentPage * itemsPerPage) - (itemsPerPage - 1)} - {currentPage * itemsPerPage}</span> of <span className="font-semibold text-gray-900 dark:text-white">{dataCompleted?.length}</span></span>
         <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
           <li>
