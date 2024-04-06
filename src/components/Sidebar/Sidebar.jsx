@@ -5,7 +5,7 @@ import logo from "../../assets/logo.webp";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <section className="page sidebar-page">
+    <section className="page sidebar-page" style={{background:"#000000"}}>
       <aside className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="inner">
           <header>
