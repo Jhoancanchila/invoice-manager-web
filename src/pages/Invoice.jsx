@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Table from "../components/Table";
 
-function Home() {
+function Invoice() {
   
   return (
     <Fragment>
@@ -15,4 +15,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Invoice;
