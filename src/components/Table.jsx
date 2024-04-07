@@ -10,6 +10,7 @@ const Row = lazy(() => import('./Row'));
 const Table = () => {
 
   const [ clients , setClients ] = useState([]);
+  const [ products , setProducts ] = useState([]);
   const [ data , setData ] = useState([]);
   const [ dataCompleted , setDataCompleted ] = useState([]);
   const [ error, setError ] = useState(null);
@@ -37,17 +38,31 @@ const Table = () => {
       throw error;
     }
   };
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/product`);
+      const data = await response.json();
+      setProducts(data.data);
+    } catch (error) {
+      setError(error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     fetchClient();
     fetchInvoices();
+    fetchProducts();
   },[]);
 
   if( error ) return < Error error={ error }/>
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <Button/>
+      <Button
+        dataClients={clients}
+        dataProducts={products}
+      />
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
