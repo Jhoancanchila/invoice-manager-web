@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import Layout from './components/Layout';
 import NotFound from './pages/NotFound';
-import Home from './pages/Home';
+import Invoice from './pages/Invoice';
+import Login from './pages/Login';
 
 function App() {
 
@@ -10,7 +11,8 @@ function App() {
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path='/' element={<Home/>}/>
+          <Route path='/' element={<Login/>}/>
+          <Route path='/invoice' element={<Invoice/>}/>
           <Route path='*' element={<NotFound/>}/>
         </Routes>
       </Layout>
