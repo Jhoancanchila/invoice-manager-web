@@ -2,7 +2,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 
 import logo from "../assets/logo.webp";
 
-const SignIn = () => {
+const SignIn = ({ HandleSignin }) => {
   return (
 
     <section section className="bg-white" >
@@ -54,7 +54,7 @@ const SignIn = () => {
                 return errors;
               }}
               onSubmit={(values, { setSubmitting, resetForm }) => {
-
+                HandleSignin(values.email,values.password)
               }}
             >
               {
