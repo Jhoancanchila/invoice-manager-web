@@ -1,17 +1,19 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import Modal from './Modal'
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
-const Button = ({ dataClients, dataProducts }) => {
+const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [error, setError] = useState(null);
+  const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
+  const [currentClientSelected, setCurrentClientSelected] = useState(dataClients[0]?.id);
 
   const initialStateForm = {   
     date: new Date(), 
     client: dataClients[0]?.id, 
-    discount: '', 
+    discount: "", 
     product:dataProducts[0]?.id
   };
 
@@ -75,8 +77,8 @@ const Button = ({ dataClients, dataProducts }) => {
   };
 
   const AddInvoice = ( object, resetForm ) => {
-    const total = totalWithoutDiscount();
-    const subtotal = subTotal(total, object.discount);
+    const subtotal = totalWithoutDiscount();
+    const total = subTotal(subtotal, object.discount);
 
     const body = {
       client: Number(object.client),
@@ -95,14 +97,21 @@ const Button = ({ dataClients, dataProducts }) => {
     };
     fetch('http://localhost:3001/invoice', requestOptions)
       .then(response => response.json())
-      .then(()=>resetForm())
+      .then(()=>{
+        setCurrentClientSelected(dataClients[0]?.id)
+        resetForm();
+      })
       .catch((error)=>setError(error))
     } catch (error) {
       throw error;
     }
   };
 
-
+  useEffect(() => {
+    const value = functionValidateSales(Number(currentClientSelected));
+    setDisableInputDiscount(value);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[currentClientSelected])
 
   return (
     <Fragment>
@@ -134,16 +143,15 @@ const Button = ({ dataClients, dataProducts }) => {
                 <Formik
                   initialValues={initialStateForm}
                   validate={values => {
+                    setCurrentClientSelected(values.client);
                     let errors = {};
-                    if (!values.discount) {
-                      errors.discount = 'This field is required';
-                    }else if(productsNewInvoice.length === 0){
+                    if(productsNewInvoice.length === 0){
                       errors.product = 'You have not added products yet!';
                     }
                     else{
-                      const yearsOldClient = dataClients.find(cli => cli.id === Number(values.client))?.years_antiquity;
-                      if(yearsOldClient > 3 && Number(values.discount) > 30){
-                        errors.discount = 'Up to 30% admitted!';
+                      if(values.discount > disableInputDiscount){
+                        if(disableInputDiscount === 0) setDisableInputDiscount(0);
+                        else errors.discount = `Up to ${disableInputDiscount}% admitted!`;                        
                       }
                     }
                     return errors;
@@ -189,17 +197,18 @@ const Button = ({ dataClients, dataProducts }) => {
                           </Field>
                           
                         </div>
-                        <div className="w-full h-24 mt-2">
-                          <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Discount</label>
-                          <Field
-                            type="text"
-                            name="discount"
-                            pattern="[0-9]{0,13}"
-                            className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
-                            placeholder="0%"
-                          />
-                          <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
-                        </div>
+                          <div className="w-full h-24 mt-2">
+                            <label htmlFor="Email" className={`${disableInputDiscount === 0 ? 'text-opacity-5' : ''} block text-sm font-medium text-gray-700`}>Discount</label>
+                            <Field
+                              type="text"
+                              name="discount"
+                              pattern="[0-9]{0,13}"
+                              className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
+                              placeholder={disableInputDiscount === 0 ? "" : "0%"}
+                              disabled={disableInputDiscount === 0}
+                            />
+                            <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
+                          </div>
                         
                         <div className="h-24">
                           <div className="flex  w-full mt-2 items-end">
