@@ -2,7 +2,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 
 import logo from "../assets/logo.webp";
 
-const SignIn = ({ HandleSignin }) => {
+const SignIn = ({ HandleSignin, errorMessage }) => {
   return (
 
     <section section className="bg-white" >
@@ -91,6 +91,7 @@ const SignIn = ({ HandleSignin }) => {
                         Iniciar sesión
                       </button>
                     </div>
+                    <span className="text-red-500">{errorMessage}</span>
                   </Form>
                 )
               }

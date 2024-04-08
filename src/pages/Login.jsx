@@ -2,11 +2,16 @@ import { useCookies } from "react-cookie";
 
 import SignIn from '../components/SignIn';
 import { useAuth } from "../context/auth";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 
+  const navigate = useNavigate();
   const [ cookies, setCookies ]= useCookies();
   const { setAuthToken, setUser } = useAuth();
+
+  const [signinError, setSigninError] = useState("");
 
   const successfullLogin = async ( token, user ) => {
 
@@ -25,6 +30,7 @@ const Login = () => {
 
   const HandleSignin = async ( username, password ) => {
 
+    setSigninError("");
     if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.getRegistration();
       if (reg) {
@@ -51,23 +57,15 @@ const Login = () => {
       if (response.ok) {
         successfullLogin(data.token, data.user);
       } else {
-        /* setSigninError({
-          state: true,
-          message: "E-mail or password wrong",
-        }); */
+        setSigninError(data);
       }
     } catch (e) {
-
-      /* setSigninError({
-        state: true,
-        message: "E-mail or password wrong",
-      }); */
-      
+      throw e;      
     }
   };
 
   return (
-    <SignIn HandleSignin={HandleSignin} />
+    <SignIn HandleSignin={HandleSignin} errorMessage = {signinError}/>
   )
 }
 
