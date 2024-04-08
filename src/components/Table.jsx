@@ -33,9 +33,9 @@ const Table = () => {
       url = `http://localhost:3001/invoice/${user.client_id}`
     }
     fetch(url,{
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
   })
     .then(response => response.json())
     .then(res => {
