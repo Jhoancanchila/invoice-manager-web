@@ -16,7 +16,37 @@ const Table = () => {
   const [ error, setError ] = useState(null);
 
   const itemsHeadTable = ["# Invoice","Client", "Date", "Subtotal", "Discount", "Total", "Products"];
+
   
+  const validateSales = ( client_id ) => {
+
+    let discountMax;
+    const yearsOldClient = clients.find(cli => cli.id === Number(client_id))?.years_antiquity;
+    const invoicesByClients = dataCompleted.filter(invoice => invoice.client_id === client_id);
+    const saleLessTwoHundred = invoicesByClients.some(inv => inv.total < 200);
+    const saleTwoThousandMajor = invoicesByClients.some(inv => inv.total > 2000);
+    const salesLowerThousand = invoicesByClients.some(inv => inv.total < 1000);
+
+    if(saleLessTwoHundred){
+      discountMax = 0;
+      return  discountMax;
+    }else if(saleTwoThousandMajor){
+      discountMax = 45;
+      return discountMax;
+    }else if(salesLowerThousand){
+      discountMax = 10;
+      return discountMax;
+    }else if(yearsOldClient >= 3){
+      discountMax = 30;
+      return discountMax;
+    }
+    else{
+      discountMax = 0;
+      return  discountMax;
+    }
+    
+  };
+
   const fetchInvoices = () => {
     fetch("http://localhost:3001/invoice")
     .then(response => response.json())
@@ -62,6 +92,7 @@ const Table = () => {
       <Button
         dataClients={clients}
         dataProducts={products}
+        functionValidateSales={validateSales}
       />
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

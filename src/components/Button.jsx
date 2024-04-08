@@ -1,12 +1,14 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import Modal from './Modal'
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
-const Button = ({ dataClients, dataProducts }) => {
+const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [error, setError] = useState(null);
+  const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
+  const [currentClientSelected, setCurrentClientSelected] = useState(dataClients[0]?.id);
 
   const initialStateForm = {   
     date: new Date(), 
@@ -102,8 +104,12 @@ const Button = ({ dataClients, dataProducts }) => {
     }
   };
 
-
-
+  useEffect(() => {
+    const value = functionValidateSales(Number(currentClientSelected));
+    setDisableInputDiscount(value);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[currentClientSelected])
+  
   return (
     <Fragment>
       <button
@@ -134,16 +140,16 @@ const Button = ({ dataClients, dataProducts }) => {
                 <Formik
                   initialValues={initialStateForm}
                   validate={values => {
+                    setCurrentClientSelected(values.client);
                     let errors = {};
-                    if (!values.discount) {
-                      errors.discount = 'This field is required';
-                    }else if(productsNewInvoice.length === 0){
+                    if(productsNewInvoice.length === 0){
                       errors.product = 'You have not added products yet!';
                     }
                     else{
-                      const yearsOldClient = dataClients.find(cli => cli.id === Number(values.client))?.years_antiquity;
-                      if(yearsOldClient > 3 && Number(values.discount) > 30){
-                        errors.discount = 'Up to 30% admitted!';
+                      const valueToValidateDiscount = functionValidateSales(Number(values.client));
+                      if(values.discount > valueToValidateDiscount){
+                        if(valueToValidateDiscount === 0) setDisableInputDiscount(0);
+                        else errors.discount = `Up to ${valueToValidateDiscount}% admitted!`;                        
                       }
                     }
                     return errors;
@@ -191,18 +197,20 @@ const Button = ({ dataClients, dataProducts }) => {
                           </Field>
                           
                         </div>
-                        <div className="w-full h-24 mt-2">
-                          <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Discount</label>
-                          <Field
-                            autoComplete="off"
-                            type="text"
-                            name="discount"
-                            pattern="[0-9]{0,13}"
-                            className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
-                            placeholder="0%"
-                          />
-                          <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
-                        </div>
+                        {
+                          <div className="w-full h-24 mt-2">
+                            <label htmlFor="Email" className={`${disableInputDiscount === 0 ? 'text-opacity-5' : ''} block text-sm font-medium text-gray-700`}>Discount</label>
+                            <Field
+                              autoComplete="off"
+                              type="text"
+                              name="discount"
+                              pattern="[0-9]{0,13}"
+                              className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
+                              placeholder={disableInputDiscount === 0 ? "" : "0%"}
+                              disabled={disableInputDiscount === 0}
+                            />
+                          </div>
+                        }
                         
                         <div className="h-24">
                           <div className="flex  w-full mt-2 items-end">
