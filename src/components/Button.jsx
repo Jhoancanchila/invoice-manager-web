@@ -13,7 +13,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   const initialStateForm = {   
     date: new Date(), 
     client: dataClients[0]?.id, 
-    discount: '', 
+    discount: "", 
     product:dataProducts[0]?.id
   };
 
@@ -77,8 +77,8 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   };
 
   const AddInvoice = ( object, resetForm ) => {
-    const total = totalWithoutDiscount();
-    const subtotal = subTotal(total, object.discount);
+    const subtotal = totalWithoutDiscount();
+    const total = subTotal(subtotal, object.discount);
 
     const body = {
       client: Number(object.client),
@@ -97,7 +97,10 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     };
     fetch('http://localhost:3001/invoice', requestOptions)
       .then(response => response.json())
-      .then(()=>resetForm())
+      .then(()=>{
+        setCurrentClientSelected(dataClients[0]?.id)
+        resetForm();
+      })
       .catch((error)=>setError(error))
     } catch (error) {
       throw error;
@@ -109,7 +112,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     setDisableInputDiscount(value);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[currentClientSelected])
-  
+
   return (
     <Fragment>
       <button
@@ -146,10 +149,9 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                       errors.product = 'You have not added products yet!';
                     }
                     else{
-                      const valueToValidateDiscount = functionValidateSales(Number(values.client));
-                      if(values.discount > valueToValidateDiscount){
-                        if(valueToValidateDiscount === 0) setDisableInputDiscount(0);
-                        else errors.discount = `Up to ${valueToValidateDiscount}% admitted!`;                        
+                      if(values.discount > disableInputDiscount){
+                        if(disableInputDiscount === 0) setDisableInputDiscount(0);
+                        else errors.discount = `Up to ${disableInputDiscount}% admitted!`;                        
                       }
                     }
                     return errors;
@@ -209,6 +211,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                               placeholder={disableInputDiscount === 0 ? "" : "0%"}
                               disabled={disableInputDiscount === 0}
                             />
+                            <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
                           </div>
                         }
                         
