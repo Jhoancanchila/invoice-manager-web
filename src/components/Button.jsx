@@ -1,12 +1,15 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import Modal from './Modal'
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import Head from './Head';
 
 const Button = ({ dataClients, dataProducts }) => {
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [error, setError] = useState(null);
+
+  const itemsHeadTable = ["Product ID","Quantity", "Product Name" ];
 
   const initialStateForm = {   
     date: new Date(), 
@@ -25,8 +28,7 @@ const Button = ({ dataClients, dataProducts }) => {
     const parseIdProduct = Number(productId);
     
     const product = dataProducts.find(item => item.id === parseIdProduct);
-    
-    let copyProducts = productsNewInvoice;
+    let copyProducts = [...productsNewInvoice];
     
     if(copyProducts.length > 0){
       const productExist = copyProducts.find(pro => pro.id === parseIdProduct);
@@ -50,8 +52,7 @@ const Button = ({ dataClients, dataProducts }) => {
     }else{
       copyProducts.push({...product,quantity:1})
     }
-    
-   
+     
     setProductsNewInvoice(copyProducts);
   };
 
@@ -102,8 +103,7 @@ const Button = ({ dataClients, dataProducts }) => {
     }
   };
 
-
-
+  
   return (
     <Fragment>
       <button
@@ -115,16 +115,12 @@ const Button = ({ dataClients, dataProducts }) => {
       <Modal
         isOpen={openModal}
         onClose={() => null}
-      >
-        <section className="bg-white">
-          <div className="lg:grid  lg:grid-cols-12">
-
-            <main
-              className="flex items-center justify-center px-8 py-4 sm:px-12 lg:col-span-7 lg:px-16 lg:py-4 xl:col-span-6"
-            >
+      > 
+        <div className='lg:flex lg:flex-row gap-4 p-12'>
+          <section class="col-span-8">
+            <section>
               <div className="max-w-xl lg:max-w-3xl">
-
-                <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
                   Add new invoice
                 </h1>
 
@@ -159,90 +155,95 @@ const Button = ({ dataClients, dataProducts }) => {
                         errors, values
                       }
                     ) => (
-                      <Form className="mt-8 gap-6">
+                      <Form className="mt-8 gap-6 lg:grid lg:grid-rows-1">
+                        <section className='lg:grid lg:grid-rows-2'>
+                          <div className="w-full h-24">
+                            <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Date</label>
+                            
+                            <input
+                              type="date"
+                              name="date"
+                              className={`mt-1 col-span-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
+                              autocomplete="off"
+                            />
 
-                        <div className="w-full h-24">
-                          <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Date</label>
-                          
-                          <input
-                            type="date"
-                            name="date"
-                            className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
-                            autocomplete="off"
-                          />
-
-                        </div>
-                        <div>
-                          <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Client</label>
-                          <Field
-                            className="mt-1  h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
-                            name="client"
-                            id="client"
-                            as="select"
-                            autocomplete="off"
-                          >
-                            {
-                              dataClients.map(cli => 
-                                <option key={cli.id} value={cli.id}>{ cli.name }</option>
-                              )
-                            }
-                          
-
-                          </Field>
-                          
-                        </div>
-                        <div className="w-full h-24 mt-2">
-                          <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Discount</label>
-                          <Field
-                            autoComplete="off"
-                            type="text"
-                            name="discount"
-                            pattern="[0-9]{0,13}"
-                            className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
-                            placeholder="0%"
-                          />
-                          <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
-                        </div>
-                        
-                        <div className="h-24">
-                          <div className="flex  w-full mt-2 items-end">
-                            <div>
-                              <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Product</label>
-                              <Field
-                                className="mt-1  h-12 w-40 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
-                                name="product"
-                                id="product"
-                                as="select"
-                                autocomplete="off"
-                              >
-                                {
-                                  dataProducts.map(pro => 
-                                    <option key={pro.id} value={pro.id}>{ pro.name }</option>
-                                  )
-                                }
-                              </Field>
-                            </div>
-                            <div className="h-12 ml-4 py-4 px-4 text-black bg-gray-400 flex items-center rounded-lg">
-                              1
-                            </div>
-                              <button type='button' onClick={() => addProductToInvoice(values.product)} className="h-12 ml-4 py-4 px-4 text-white bg-gray-700 hover:bg-gray-500 flex items-center rounded-lg">
-                                +
-                              </button>
                           </div>
+                          <div>
+                            <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Client</label>
+                            <Field
+                              className="mt-1 col-span-1 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+                              name="client"
+                              id="client"
+                              as="select"
+                              autocomplete="off"
+                            >
+                              {
+                                dataClients.map(cli => 
+                                  <option key={cli.id} value={cli.id}>{ cli.name }</option>
+                                )
+                              }
+                            
 
-                        </div>
-                          <ErrorMessage name="product" component={()=>(<span className='text-red-500 font-thin'>{errors.product}</span>)}/>
+                            </Field>
+                            
+                          </div>
+                        </section>
+                        <section className='lg:grid lg:grid-rows-2'>
+
+                          <div className="w-full h-24 mt-2">
+                            <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Discount</label>
+                            <Field
+                              autoComplete="off"
+                              type="text"
+                              name="discount"
+                              pattern="[0-9]{0,13}"
+                              className={`mt-1 col-span-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
+                              placeholder="0%"
+                            />
+                            <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
+                          </div>
+                          
+                          <div className="h-24">
+                            <div className="flex  w-full mt-2 items-end">
+                              <div>
+                                <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Product</label>
+                                <Field
+                                  className="mt-1 col-span-1 h-12 w-40 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+                                  name="product"
+                                  id="product"
+                                  as="select"
+                                  autocomplete="off"
+                                >
+                                  {
+                                    dataProducts.map(pro => 
+                                      <option key={pro.id} value={pro.id}>{ pro.name }</option>
+                                    )
+                                  }
+                                </Field>
+                              </div>
+                              <div className="h-12 ml-4 py-4 px-4 text-black bg-gray-400 flex items-center rounded-lg">
+                                1
+                              </div>
+                                <button type='button' onClick={() => addProductToInvoice(values.product)} className="h-12 ml-4 py-4 px-4 text-white bg-gray-700 hover:bg-gray-500 flex items-center rounded-lg">
+                                  +
+                                </button>
+                            </div>
+
+                          </div>
+                            <ErrorMessage name="product" component={()=>(<span className='text-red-500 font-thin'>{errors.product}</span>)}/>
+                        </section>
+
                         <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                           <button
                             type='submit'
-                            className="mt-8 inline-block bg-gray-700 hover:bg-gray-500 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide "
+                            className="inline-block bg-gray-700 hover:bg-gray-500 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide "
                           >
                             Add
                           </button>
                           <button
                             type='button'
                             onClick ={handleCancel}
-                            className="ml-4 mt-8 inline-block bg-gray-500 hover:bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide "
+                            className="ml-4 inline-block bg-gray-500 hover:bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide "
                           >
                             Cancel
                           </button>
@@ -251,10 +252,41 @@ const Button = ({ dataClients, dataProducts }) => {
                     )
                   }
                 </Formik>
+
               </div>
-            </main>
-          </div>
-        </section>
+            </section>
+          </section>
+          <section class="col-span-4 overflow-y-scroll mt-12 lg:mt-0 max-h-60">
+            <table className='mx-auto text-center'>
+              <thead>
+                <tr>
+                  {
+                    itemsHeadTable?.map(item => <Head key={item} item={item}/>)
+                  }                     
+                </tr>
+              </thead>
+                <tbody>
+                  {
+                    productsNewInvoice?.map(product => {
+                      return (
+                        <tr key={product.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">                      
+                          <td className="px-6 py-4">
+                            {product.id}
+                          </td>
+                          <td className="px-6 py-4">
+                            {product.quantity}
+                          </td>
+                          <td className="px-6 py-4">
+                            {product.name}
+                          </td>                      
+                        </tr>
+                      )
+                    })
+                  }
+                </tbody>
+            </table>
+          </section>
+        </div>
       </Modal>
     </Fragment>
   )
