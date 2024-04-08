@@ -176,7 +176,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                             type="date"
                             name="date"
                             className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
-                            autocomplete="off"
                           />
 
                         </div>
@@ -187,7 +186,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                             name="client"
                             id="client"
                             as="select"
-                            autocomplete="off"
                           >
                             {
                               dataClients.map(cli => 
@@ -199,11 +197,9 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                           </Field>
                           
                         </div>
-                        {
                           <div className="w-full h-24 mt-2">
                             <label htmlFor="Email" className={`${disableInputDiscount === 0 ? 'text-opacity-5' : ''} block text-sm font-medium text-gray-700`}>Discount</label>
                             <Field
-                              autoComplete="off"
                               type="text"
                               name="discount"
                               pattern="[0-9]{0,13}"
@@ -213,7 +209,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                             />
                             <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
                           </div>
-                        }
                         
                         <div className="h-24">
                           <div className="flex  w-full mt-2 items-end">
@@ -224,7 +219,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                                 name="product"
                                 id="product"
                                 as="select"
-                                autocomplete="off"
                               >
                                 {
                                   dataProducts.map(pro => 
