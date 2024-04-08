@@ -7,7 +7,7 @@ function Invoice() {
   return (
     <Fragment>
       <Sidebar/>
-      <div className="lg:w-[60%] mx-auto mt-28 w-[90%]">
+      <div className="lg:w-[60%] mx-auto mt-12 w-[90%]">
       <Table />
 
       </div>

@@ -4,10 +4,14 @@ import Loading from './Loading';
 import Head from './Head';
 import Pagination from './Pagination';
 import Button from './Button';
+import { useAuth } from '../context/auth';
+import { Cookies } from "react-cookie";
 
 const Row = lazy(() => import('./Row'));
 
 const Table = () => {
+
+  const cookies = new Cookies();
 
   const [ clients , setClients ] = useState([]);
   const [ products , setProducts ] = useState([]);
@@ -15,10 +19,24 @@ const Table = () => {
   const [ dataCompleted , setDataCompleted ] = useState([]);
   const [ error, setError ] = useState(null);
 
+  const { user } = useAuth();
+
+  const token = cookies.get("token")
+
   const itemsHeadTable = ["# Invoice","Client", "Date", "Subtotal", "Discount", "Total", "Products"];
   
   const fetchInvoices = () => {
-    fetch("http://localhost:3001/invoice")
+    let url;
+    if(user.role_id === 1){
+      url = "http://localhost:3001/invoice";
+    }else{
+      url = `http://localhost:3001/invoice/${user.client_id}`
+    }
+    fetch(url,{
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  })
     .then(response => response.json())
     .then(res => {
       setDataCompleted(res.data);
@@ -52,17 +70,22 @@ const Table = () => {
   useEffect(() => {
     fetchClient();
     fetchInvoices();
-    fetchProducts();
+    if(user.role_id === 1){
+      fetchProducts();
+    }
   },[]);
 
   if( error ) return < Error error={ error }/>
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <Button
-        dataClients={clients}
-        dataProducts={products}
-      />
+      {
+        user.role_id === 1 &&
+        <Button
+          dataClients={clients}
+          dataProducts={products}
+        />
+      }
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>

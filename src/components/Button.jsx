@@ -168,7 +168,6 @@ const Button = ({ dataClients, dataProducts }) => {
                             type="date"
                             name="date"
                             className={`mt-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
-                            autocomplete="off"
                           />
 
                         </div>
@@ -179,7 +178,6 @@ const Button = ({ dataClients, dataProducts }) => {
                             name="client"
                             id="client"
                             as="select"
-                            autocomplete="off"
                           >
                             {
                               dataClients.map(cli => 
@@ -194,7 +192,6 @@ const Button = ({ dataClients, dataProducts }) => {
                         <div className="w-full h-24 mt-2">
                           <label htmlFor="Email" className="block text-sm font-medium text-gray-700">Discount</label>
                           <Field
-                            autoComplete="off"
                             type="text"
                             name="discount"
                             pattern="[0-9]{0,13}"
@@ -213,7 +210,6 @@ const Button = ({ dataClients, dataProducts }) => {
                                 name="product"
                                 id="product"
                                 as="select"
-                                autocomplete="off"
                               >
                                 {
                                   dataProducts.map(pro => 
