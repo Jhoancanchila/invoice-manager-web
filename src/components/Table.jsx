@@ -130,7 +130,7 @@ const Table = () => {
         <tbody>
           {
             data?.map(invoice => {
-              const client = clients.find(cli => cli.id === invoice.client_id)?.contact_name;
+              const client = clients.find(cli => cli.id === invoice.client_id)?.name;
               const newInvoice = {...invoice, client }
               return (
                 <Suspense fallback={<Loading cells = {itemsHeadTable}/>}>

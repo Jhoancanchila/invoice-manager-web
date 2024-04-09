@@ -137,7 +137,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
       Swal.fire("You have not added products yet!")
       return;      
     };
-    const discount = disableInputDiscount === 0 ? 0 : object.discount;
+    const discount = disableInputDiscount === 0 ? 0 : Number(object.discount);
     const subtotal = totalWithoutDiscount();
     const total = subTotal(subtotal, discount);
 
@@ -188,7 +188,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     setDisableInputDiscount(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentClientSelected]);
-
+  
   return (
     <Fragment>
       <button
