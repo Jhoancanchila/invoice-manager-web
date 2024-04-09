@@ -3,7 +3,7 @@ import Modal from './Modal';
 import Head from './Head';
 import Error from './Error';
 
-const IconDetail = ({ children, invoiceId, endpointOne =null, endpointTwo=null }) => {
+const IconDetail = ({ children, invoiceId, action, voucher }) => {
   const [ openModal, setOpenModal ] = useState(false);
   const [ dataProductInvoice, setDataProductInvoice ] = useState([]);
   const [ dataProducts, setDataProduct ] = useState([]);
@@ -11,22 +11,25 @@ const IconDetail = ({ children, invoiceId, endpointOne =null, endpointTwo=null }
 
   const itemsHeadTable = ["Product ID","Quantity", "Product Name" ];
 
-  const getProducts = async () => {
+  const openModalFunction = async () => {
+    if(action === "voucher"){
+      if(!voucher) return;
+    }
     setOpenModal(true);
   };
 
-  const fetchDataOne = async () => {
+  const getProductsInvoice = async () => {
     try {
-      const response = await fetch(endpointOne);
+      const response = await fetch(`http://localhost:3001/invoice-product/${invoiceId}`);
       const data = await response.json();
       setDataProductInvoice(data.data);
     } catch (error) {
       setError(error);
     }
   };
-  const fetchDataTwo = async () => {
+  const getProducts = async () => {
     try {
-      const response = await fetch(endpointTwo);
+      const response = await fetch("http://localhost:3001/product");
       const data = await response.json();
       setDataProduct(data.data);
     } catch (error) {
@@ -35,20 +38,32 @@ const IconDetail = ({ children, invoiceId, endpointOne =null, endpointTwo=null }
   };
 
   useEffect(() => {
-    if(endpointOne) fetchDataOne();
+    if(action === "products") getProductsInvoice();
     
-    if(endpointTwo) fetchDataTwo();
+    if(action === "products") getProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
-
+  
   return (
     <Fragment>
-      <div onClick={getProducts}>{children}</div>
+      <div onClick={openModalFunction}>{children}</div>
       <Modal isOpen={openModal} onClose={() =>setOpenModal(false)}>
-        <h1 className='mx-auto text-center font-bold '>Invoice # {invoiceId}</h1>
+        <h1 className='mx-auto text-center text-3xl '>Invoice # {invoiceId}</h1>
         {
           !error ?
-          <table className='mx-auto text-center'>
+          action === "voucher" ?
+          (
+          <span className='flex items-center justify-center'>
+            {
+              voucher ?
+              <img className='w-full object-cover' src={voucher} alt="voucher" />
+              :
+              <h2>No image to show!!</h2>
+            }
+          </span>
+          )
+          :
+          (<table className='mx-auto text-center'>
             <thead>
               <tr>
                 {
@@ -76,9 +91,9 @@ const IconDetail = ({ children, invoiceId, endpointOne =null, endpointTwo=null }
                   })
                 }
               </tbody>
-          </table>
+          </table>)
           :
-          <Error error={error}/>
+          (<Error error={error}/>)
         }
       </Modal>
     </Fragment>

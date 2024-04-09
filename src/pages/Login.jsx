@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const Login = () => {
 
-  const [ setCookies ]= useCookies();
+  const [cookies, setCookies] = useCookies();
   const { setAuthToken, setUser } = useAuth();
 
   const [signinError, setSigninError] = useState("");

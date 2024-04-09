@@ -23,7 +23,7 @@ const Table = () => {
 
   const token = cookies.get("token")
 
-  const itemsHeadTable = ["# Invoice","Client", "Date", "Subtotal", "Discount", "Total", "Products"];
+  const itemsHeadTable = ["# Invoice","Client", "Date", "Subtotal", "Discount", "Total", "Products", "Voucher"];
 
   
   const validateSales = ( client_id ) => {
@@ -133,7 +133,7 @@ const Table = () => {
               const client = clients.find(cli => cli.id === invoice.client_id)?.contact_name;
               const newInvoice = {...invoice, client }
               return (
-                <Suspense fallback={<Loading/>}>
+                <Suspense fallback={<Loading cells = {itemsHeadTable}/>}>
                   <Row key={invoice.id} {...newInvoice }/>
                 </Suspense>
               )

@@ -12,6 +12,8 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
   const [currentClientSelected, setCurrentClientSelected] = useState(dataClients[0]?.id);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [uploadedImg, setUploadedImg] = useState('');
   const [initialStateForm, setInitialStateForm] = useState(
     {
       date: new Date(),
@@ -22,6 +24,45 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   );
 
   const itemsHeadTable = ["Product ID", "Quantity", "Product Name"];
+
+  
+  const handleImageCapture = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      setUploadedImg(file)
+      let file_type = e.target.files[0]?.type.split("/");
+      if (file_type[0] === "image") {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
+    }
+   };
+
+  const handleUploadImage = async( idInvoice ) => {
+   
+    let voucher = new FormData();
+    voucher.append("image", uploadedImg);
+    voucher.append("idInvoice", idInvoice);
+ 
+     await fetch('http://localhost:3001/upload-image', {
+       method: 'POST',
+       body: voucher
+     })
+     .then(res => {
+       if (res.ok) {
+          setUploadedImg("");
+          setPreviewUrl("");
+         return res.json();
+       } else {
+         throw new Error('Image upload failed!');
+       }
+     })
+     .catch(error => {
+       throw error;
+     });
+    
+   };
 
   const addNewInvoice = () => {
     setInitialStateForm(
@@ -35,6 +76,8 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     setOpenModal(true);
   }
   const handleCancel = () => {
+    setUploadedImg("");
+    setPreviewUrl("");
     setProductsNewInvoice([]);
     setOpenModal(false);
   }
@@ -106,7 +149,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
       discount: discount,
       products: productsNewInvoice
     }
-    console.log("🚀 ~ AddInvoice ~ body:", body,disableInputDiscount)
 
     const requestOptions = {
       method: 'POST',
@@ -115,6 +157,9 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     };
     try {
       const response = await fetch('http://localhost:3001/invoice', requestOptions);
+      const data = await response.json();
+      const { id } = data.data;
+      console.log(id)
       if (response.ok) {
         setCurrentClientSelected(dataClients[0]?.id);
         setProductsNewInvoice([]);
@@ -123,6 +168,9 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
           title: "Successfully saved!",
           icon: "success"
         });
+
+        if(uploadedImg) handleUploadImage();
+        
       } else {
         Swal.fire({
           icon: "error",
@@ -140,7 +188,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     setDisableInputDiscount(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentClientSelected]);
-  console.log(disableInputDiscount)
 
   return (
     <Fragment>
@@ -154,7 +201,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
         isOpen={openModal}
         onClose={() => null}
       >
-        <div className='lg:flex lg:flex-row gap-4 p-12'>
+        <div className='lg:flex lg:flex-row gap-4 px-8 lg:p-12'>
           <section className="col-span-8">
             <section>
               <div className="max-w-xl lg:max-w-3xl">
@@ -168,7 +215,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                 <Formik
                   initialValues={initialStateForm}
                   validate={values => {
-                    console.log("🚀 ~ Button ~ values:", Number(values.discount))
                     setCurrentClientSelected(Number(values.client));
                     let errors = {};
                     if (values.discount < 0) {
@@ -272,7 +318,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                           <ErrorMessage name="product" component={() => (<span className='text-red-500 font-thin'>{errors.product}</span>)} />
                         </section>
 
-                        <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+                        <div className="col-span-6 sm:flex sm:items-center sm:gap-4 mt-4 lg:mt-0">
                           <button
                             type='submit'
                             className="inline-block bg-gray-700 hover:bg-gray-500 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide "
@@ -295,35 +341,52 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
               </div>
             </section>
           </section>
-          <section className="col-span-4 overflow-y-scroll mt-12 lg:mt-0 max-h-60">
-            <table className='mx-auto text-center'>
-              <thead>
-                <tr>
+          <section className="col-span-4 mt-8 lg:mt-0 grid grid-rows-2">
+            <section>
+          
+
+            <div className='flex items-center justify-center min-h-36'>
+              <span>
+                <img width={200} height={200}  src={uploadedImg ? previewUrl : "https://placehold.co/600x400/png"} alt="capture" />
+              </span>
+            </div>
+            <div className="flex items-center justify-center ">
+              <input type="file" id="upload-image" name="upload-image" className="hidden" accept="image/*" capture="camera" onChange={handleImageCapture}/>
+              <label htmlFor="upload-image" className="cursor-pointer bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide">
+                <span>Upload image</span>
+              </label>
+            </div>
+            </section>
+            <section className='overflow-y-scroll mt-2 lg:mt-0 max-h-40'>
+              <table className='mx-auto text-center'>
+                <thead>
+                  <tr>
+                    {
+                      itemsHeadTable?.map(item => <Head key={item} item={item} />)
+                    }
+                  </tr>
+                </thead>
+                <tbody>
                   {
-                    itemsHeadTable?.map(item => <Head key={item} item={item} />)
+                    productsNewInvoice?.map(product => {
+                      return (
+                        <tr key={product.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                          <td className="px-6 py-4">
+                            {product.id}
+                          </td>
+                          <td className="px-6 py-4">
+                            {product.quantity}
+                          </td>
+                          <td className="px-6 py-4">
+                            {product.name}
+                          </td>
+                        </tr>
+                      )
+                    })
                   }
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  productsNewInvoice?.map(product => {
-                    return (
-                      <tr key={product.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <td className="px-6 py-4">
-                          {product.id}
-                        </td>
-                        <td className="px-6 py-4">
-                          {product.quantity}
-                        </td>
-                        <td className="px-6 py-4">
-                          {product.name}
-                        </td>
-                      </tr>
-                    )
-                  })
-                }
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </section>
           </section>
         </div>
       </Modal>
