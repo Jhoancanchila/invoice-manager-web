@@ -174,7 +174,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                     if (values.discount < 0) {
                       errors.discount = 'The discount must be positive!';
                     }else if(/[a-zA-Z]/.test(values.discount)){
-                      errors.discount = 'Only numbers are accepted!';
+                      errors.discount = 'Enter a valid value!';
                     }
                     else {
                       if (values.discount > disableInputDiscount) {
