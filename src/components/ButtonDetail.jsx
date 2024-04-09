@@ -3,7 +3,7 @@ import Modal from './Modal';
 import Head from './Head';
 import Error from './Error';
 
-const IconDetail = ({ children, invoiceId, action, voucher }) => {
+const ButtonDetail = ({ children, invoiceId, action, voucher }) => {
   const [ openModal, setOpenModal ] = useState(false);
   const [ dataProductInvoice, setDataProductInvoice ] = useState([]);
   const [ dataProducts, setDataProduct ] = useState([]);
@@ -100,4 +100,4 @@ const IconDetail = ({ children, invoiceId, action, voucher }) => {
   )
 }
 
-export default IconDetail
+export default ButtonDetail
