@@ -3,12 +3,10 @@ import { useCookies } from "react-cookie";
 import SignIn from '../components/SignIn';
 import { useAuth } from "../context/auth";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 
-  const navigate = useNavigate();
-  const [ cookies, setCookies ]= useCookies();
+  const [ setCookies ]= useCookies();
   const { setAuthToken, setUser } = useAuth();
 
   const [signinError, setSigninError] = useState("");

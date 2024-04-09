@@ -103,6 +103,7 @@ const Table = () => {
     if(user.role_id === 1){
       fetchProducts();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
 
   if( error ) return < Error error={ error }/>
