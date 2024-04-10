@@ -18,6 +18,7 @@ const Table = () => {
   const [ data , setData ] = useState([]);
   const [ dataCompleted , setDataCompleted ] = useState([]);
   const [ error, setError ] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { user } = useAuth();
 
@@ -121,9 +122,14 @@ const Table = () => {
       {
         user.role_id === 1 &&
         <ModalNewInvoice
+          dataShowCurrent = {data}
+          dataInvoices = {dataCompleted}
           dataClients={clients}
           dataProducts={products}
           functionValidateSales={validateSales}
+          functionDataCompleted = {setDataCompleted}
+          functionDataShowCurrent = {setData}
+          functionCurrentPage = {setCurrentPage}
         />
       }
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -148,7 +154,13 @@ const Table = () => {
           }
         </tbody>
       </table>
-      <Pagination totalData={dataCompleted} setData={setData}/>
+      <Pagination 
+        totalData={dataCompleted} 
+        setData={setData}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        dataCurrentShow = {data}
+      />
     </div>
   )
 }

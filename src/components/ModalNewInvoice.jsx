@@ -7,7 +7,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import Swal from 'sweetalert2';
 
 
-const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) => {
+const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales, dataInvoices, functionDataCompleted, dataShowCurrent, functionDataShowCurrent, functionCurrentPage }) => {
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
@@ -132,6 +132,16 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
     return `${year}-${month}-${day}`;
   };
 
+  const pageChange = (dataCompleted) => {
+    const totalPages = Math.ceil(dataCompleted.length / 10);
+    functionDataCompleted(dataCompleted);
+    functionCurrentPage(totalPages);
+    const indexOfLastItem = totalPages * 10;
+    const indexOfFirstItem = indexOfLastItem - 10;
+    const currentItems = dataCompleted.slice(indexOfFirstItem, indexOfLastItem);
+    functionDataShowCurrent(currentItems);
+  };
+
   const AddInvoice = async (object, resetForm) => {
     if (productsNewInvoice.length === 0) {
       Swal.fire("You have not added products yet!")
@@ -158,8 +168,11 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
     try {
       const response = await fetch('http://localhost:3001/invoice', requestOptions);
       const data = await response.json();
-      const id = data.data;
+      const newInvoice = data.data;
       if (response.ok) {
+        const newDataInvoices = [...dataInvoices,newInvoice[0]];
+        
+        pageChange(newDataInvoices);
         setCurrentClientSelected(dataClients[0]?.id);
         setProductsNewInvoice([]);
         resetForm();
@@ -169,7 +182,7 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
         });
 
         if (uploadedImg) {
-          await handleUploadImage(id[0]?.id);
+          await handleUploadImage(newInvoice[0]?.id);
         }
 
       } else {
