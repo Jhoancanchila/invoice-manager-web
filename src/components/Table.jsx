@@ -3,7 +3,7 @@ import Error from './Error';
 import Loading from './Loading';
 import Head from './Head';
 import Pagination from './Pagination';
-import Button from './Button';
+import ModalNewInvoice from './ModalNewInvoice';
 import { useAuth } from '../context/auth';
 import { Cookies } from "react-cookie";
 
@@ -120,7 +120,7 @@ const Table = () => {
 
       {
         user.role_id === 1 &&
-        <Button
+        <ModalNewInvoice
           dataClients={clients}
           dataProducts={products}
           functionValidateSales={validateSales}

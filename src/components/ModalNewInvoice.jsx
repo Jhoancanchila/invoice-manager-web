@@ -7,7 +7,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import Swal from 'sweetalert2';
 
 
-const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
+const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) => {
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
@@ -158,8 +158,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     try {
       const response = await fetch('http://localhost:3001/invoice', requestOptions);
       const data = await response.json();
-      const { id } = data.data;
-      console.log(id)
+      const id = data.data;
       if (response.ok) {
         setCurrentClientSelected(dataClients[0]?.id);
         setProductsNewInvoice([]);
@@ -169,7 +168,9 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
           icon: "success"
         });
 
-        if(uploadedImg) handleUploadImage();
+        if(uploadedImg){
+         await handleUploadImage(id[0]?.id);
+        }
         
       } else {
         Swal.fire({
@@ -394,4 +395,4 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   )
 }
 
-export default Button
+export default ModalNewInvoice
