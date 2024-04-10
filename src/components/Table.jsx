@@ -116,7 +116,7 @@ const Table = () => {
   if( error ) return < Error error={ error }/>
 
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-[700px] lg:max-h-[800px]">
 
       {
         user.role_id === 1 &&
@@ -140,7 +140,7 @@ const Table = () => {
               const client = clients.find(cli => cli.id === invoice.client_id)?.name;
               const newInvoice = {...invoice, client }
               return (
-                <Suspense fallback={<Loading cells = {itemsHeadTable}/>}>
+                <Suspense key={invoice.id} fallback={<Loading cells = {itemsHeadTable}/>}>
                   <Row key={invoice.id} {...newInvoice }/>
                 </Suspense>
               )

@@ -25,7 +25,7 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
 
   const itemsHeadTable = ["Product ID", "Quantity", "Product Name"];
 
-  
+
   const handleImageCapture = (e) => {
     const file = e.target.files[0];
 
@@ -37,32 +37,32 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
         setPreviewUrl(url);
       }
     }
-   };
+  };
 
-  const handleUploadImage = async( idInvoice ) => {
-   
+  const handleUploadImage = async (idInvoice) => {
+
     let voucher = new FormData();
     voucher.append("image", uploadedImg);
     voucher.append("idInvoice", idInvoice);
- 
-     await fetch('http://localhost:3001/upload-image', {
-       method: 'POST',
-       body: voucher
-     })
-     .then(res => {
-       if (res.ok) {
+
+    await fetch('http://localhost:3001/upload-image', {
+      method: 'POST',
+      body: voucher
+    })
+      .then(res => {
+        if (res.ok) {
           setUploadedImg("");
           setPreviewUrl("");
-         return res.json();
-       } else {
-         throw new Error('Image upload failed!');
-       }
-     })
-     .catch(error => {
-       throw error;
-     });
-    
-   };
+          return res.json();
+        } else {
+          throw new Error('Image upload failed!');
+        }
+      })
+      .catch(error => {
+        throw error;
+      });
+
+  };
 
   const addNewInvoice = () => {
     setInitialStateForm(
@@ -133,9 +133,9 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
   };
 
   const AddInvoice = async (object, resetForm) => {
-    if(productsNewInvoice.length === 0){
+    if (productsNewInvoice.length === 0) {
       Swal.fire("You have not added products yet!")
-      return;      
+      return;
     };
     const discount = disableInputDiscount === 0 ? 0 : Number(object.discount);
     const subtotal = totalWithoutDiscount();
@@ -168,10 +168,10 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
           icon: "success"
         });
 
-        if(uploadedImg){
-         await handleUploadImage(id[0]?.id);
+        if (uploadedImg) {
+          await handleUploadImage(id[0]?.id);
         }
-        
+
       } else {
         Swal.fire({
           icon: "error",
@@ -189,7 +189,7 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
     setDisableInputDiscount(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentClientSelected]);
-  
+
   return (
     <Fragment>
       <button
@@ -220,7 +220,7 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
                     let errors = {};
                     if (values.discount < 0) {
                       errors.discount = 'The discount must be positive!';
-                    }else if(/[a-zA-Z]/.test(values.discount)){
+                    } else if (/[a-zA-Z]/.test(values.discount)) {
                       errors.discount = 'Enter a valid value!';
                     }
                     else {
@@ -286,7 +286,7 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
                               disabled={disableInputDiscount === 0}
                               maxLength={4}
                             />
-                            <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
+                            <ErrorMessage name="discount" component={() => (<span className='text-red-500 font-thin'>{errors.discount}</span>)} />
                           </div>
 
                           <div className="h-24 flex flex-col justify-center">
@@ -342,21 +342,24 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales }) =
               </div>
             </section>
           </section>
-          <section className="col-span-4 mt-8 lg:mt-0 grid grid-rows-2">
+          <section className="col-span-4 mt-8 lg:mt-0 grid lg:block">
             <section>
-          
-
-            <div className='flex items-center justify-center min-h-36'>
-              <span>
-                <img width={200} height={200}  src={uploadedImg ? previewUrl : "https://placehold.co/600x400/png"} alt="capture" />
-              </span>
-            </div>
-            <div className="flex items-center justify-center ">
-              <input type="file" id="upload-image" name="upload-image" className="hidden" accept="image/*" capture="camera" onChange={handleImageCapture}/>
-              <label htmlFor="upload-image" className="cursor-pointer bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide">
-                <span>Upload image</span>
-              </label>
-            </div>
+              {
+                previewUrl &&
+                (
+                  <div className='flex items-center justify-center min-h-36'>
+                    <span>
+                      <img width={200} height={200} src={uploadedImg ? previewUrl : "https://placehold.co/600x400/png"} alt="capture" />
+                    </span>
+                  </div>
+                )
+              }
+              <div className="flex items-center justify-center ">
+                <input type="file" id="upload-image" name="upload-image" className="hidden" accept="image/*" capture="camera" onChange={handleImageCapture} />
+                <label htmlFor="upload-image" className="cursor-pointer bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide">
+                  <span>Upload image</span>
+                </label>
+              </div>
             </section>
             <section className='overflow-y-scroll mt-2 lg:mt-0 max-h-40'>
               <table className='mx-auto text-center'>
