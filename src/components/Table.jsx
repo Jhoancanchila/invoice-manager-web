@@ -73,7 +73,14 @@ const Table = () => {
       const currentItems = res.data.slice(0, 10);
       setData(currentItems);
     })
-    .catch(error => setError(error))  
+    .catch(error => {
+      setError(error)
+      if (error?.response?.status === 401) {
+        cookies.remove("token");
+        cookies.remove("user");
+        document.location.href="/";
+      }
+    })  
   };
 
   const fetchClient = async () => {
