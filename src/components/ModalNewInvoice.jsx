@@ -7,7 +7,16 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import Swal from 'sweetalert2';
 
 
-const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales, dataInvoices, functionDataCompleted, dataShowCurrent, functionDataShowCurrent, functionCurrentPage }) => {
+const ModalNewInvoice = ({ 
+  dataClients, 
+  dataProducts, 
+  functionValidateSales, 
+  dataInvoices, 
+  functionDataCompleted, 
+  functionDataShowCurrent, 
+  functionCurrentPage 
+}) => {
+
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
@@ -132,7 +141,7 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales, dat
     return `${year}-${month}-${day}`;
   };
 
-  const pageChange = (dataCompleted) => {
+  const pageChange = ( dataCompleted ) => {
     const totalPages = Math.ceil(dataCompleted.length / 10);
     functionDataCompleted(dataCompleted);
     functionCurrentPage(totalPages);
@@ -231,16 +240,9 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales, dat
                   validate={values => {
                     setCurrentClientSelected(Number(values.client));
                     let errors = {};
-                    if (values.discount < 0) {
-                      errors.discount = 'The discount must be positive!';
-                    } else if (/[a-zA-Z]/.test(values.discount)) {
-                      errors.discount = 'Enter a valid value!';
-                    }
-                    else {
-                      if (values.discount > disableInputDiscount) {
-                        if (disableInputDiscount === 0) setDisableInputDiscount(0);
-                        else errors.discount = `Up to ${disableInputDiscount}% admitted!`;
-                      }
+                    if (values.discount > disableInputDiscount) {
+                      if (disableInputDiscount === 0) setDisableInputDiscount(0);
+                      else errors.discount = `Up to ${disableInputDiscount}% admitted!`;
                     }
                     return errors;
                   }}
@@ -291,13 +293,14 @@ const ModalNewInvoice = ({ dataClients, dataProducts, functionValidateSales, dat
                           <div className="w-full h-24 flex flex-col justify-start">
                             <label htmlFor="Email" className={`${disableInputDiscount === 0 ? 'text-opacity-5' : ''} block text-sm font-medium text-gray-700`}>Discount</label>
                             <Field
-                              type="text"
-                              step="0.01"
+                              type="number"
+                              step="0.1"
+                              min="0" 
+                              max="100"
                               name="discount"
                               className={`mt-1 col-span-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
                               placeholder={disableInputDiscount === 0 ? "" : "0%"}
                               disabled={disableInputDiscount === 0}
-                              maxLength={4}
                             />
                             <ErrorMessage name="discount" component={() => (<span className='text-red-500 font-thin'>{errors.discount}</span>)} />
                           </div>

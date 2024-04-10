@@ -122,7 +122,6 @@ const Table = () => {
       {
         user.role_id === 1 &&
         <ModalNewInvoice
-          dataShowCurrent = {data}
           dataInvoices = {dataCompleted}
           dataClients={clients}
           dataProducts={products}
