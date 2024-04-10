@@ -27,7 +27,7 @@ const Sidebar = () => {
 
   const getClient = async() =>{
     try {
-      const response = await fetch(`http://localhost:3001/client/${client_id}`);
+      const response = await fetch(`http://localhost:3001/api/clients/${client_id}`);
       const data = await response.json();
       const clientFetch = data.data;
       setClient(clientFetch[0]);

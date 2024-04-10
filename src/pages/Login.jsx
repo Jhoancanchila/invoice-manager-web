@@ -37,7 +37,7 @@ const Login = () => {
           username: username,
           password: password
       };
-      const response = await fetch("http://localhost:3001/auth/sign-in",
+      const response = await fetch("http://localhost:3001/api/auth/sign-in",
       {
         method: 'POST',
         headers: {

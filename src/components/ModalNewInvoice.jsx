@@ -54,7 +54,7 @@ const ModalNewInvoice = ({
     voucher.append("image", uploadedImg);
     voucher.append("idInvoice", idInvoice);
 
-    await fetch('http://localhost:3001/upload-image', {
+    await fetch('http://localhost:3001/api/upload-image', {
       method: 'POST',
       body: voucher
     })
@@ -175,7 +175,7 @@ const ModalNewInvoice = ({
       body: JSON.stringify(body)
     };
     try {
-      const response = await fetch('http://localhost:3001/invoice', requestOptions);
+      const response = await fetch('http://localhost:3001/api/invoices', requestOptions);
       const data = await response.json();
       const newInvoice = data.data;
       if (response.ok) {
