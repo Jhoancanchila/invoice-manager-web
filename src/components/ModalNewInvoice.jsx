@@ -14,7 +14,7 @@ const ModalNewInvoice = ({
   dataInvoices, 
   functionDataCompleted, 
   functionDataShowCurrent, 
-  functionCurrentPage 
+  functionCurrentPage
 }) => {
 
   const [openModal, setOpenModal] = useState(false);
@@ -48,29 +48,31 @@ const ModalNewInvoice = ({
     }
   };
 
-  const handleUploadImage = async (idInvoice) => {
+  const handleUploadImage = async ( idInvoice ) => {
 
     let voucher = new FormData();
     voucher.append("image", uploadedImg);
     voucher.append("idInvoice", idInvoice);
 
-    await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/upload-image', {
-      method: 'POST',
-      body: voucher
-    })
-    .then(res => {
-      if (res.ok) {
-        setUploadedImg("");
-        setPreviewUrl("");
-        return res.json();
-      } else {
-        throw new Error('Image upload failed!');
-      }
-    })
-    .catch(error => {
-      throw error;
-    });
+    return new Promise(async ( resolve, reject ) => {
 
+      try {
+        
+        const response = await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/upload-image', {
+          method: 'POST',
+          body: voucher
+        });
+
+        if(response.status === 200){
+          setUploadedImg("");
+          setPreviewUrl("");
+        };
+        resolve(response);
+
+      } catch (error) {
+        reject(error.response || error);
+      };
+    });
   };
 
   const addNewInvoice = () => {
@@ -152,6 +154,7 @@ const ModalNewInvoice = ({
   };
 
   const AddInvoice = async (object, resetForm) => {
+    let newDataInvoices = [];
     if (productsNewInvoice.length === 0) {
       Swal.fire("You have not added products yet!")
       return;
@@ -179,9 +182,23 @@ const ModalNewInvoice = ({
       const data = await response.json();
       const newInvoice = data.data;
       if (response.ok) {
-        const newDataInvoices = [...dataInvoices,newInvoice[0]];
-        
-        pageChange(newDataInvoices);
+        if (uploadedImg) {
+          const response = await handleUploadImage(newInvoice[0]?.id);
+          const data = await response.json();
+          if(response.status === 200){
+            const objectNewInvoice = newInvoice[0];
+            let newData = {
+              ...objectNewInvoice,
+              voucher: data.location
+            };
+            newDataInvoices = [...dataInvoices,newData];
+            pageChange(newDataInvoices);
+          };
+        }else{
+          newDataInvoices = [...dataInvoices,newInvoice[0]];
+          pageChange(newDataInvoices);
+        }
+                
         setCurrentClientSelected(dataClients[0]?.id);
         setProductsNewInvoice([]);
         resetForm();
@@ -189,10 +206,6 @@ const ModalNewInvoice = ({
           title: "Successfully saved!",
           icon: "success"
         });
-
-        if (uploadedImg) {
-          const response = await handleUploadImage(newInvoice[0]?.id);
-        };
 
       } else {
         Swal.fire({
