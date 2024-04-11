@@ -3,7 +3,7 @@ import Modal from './Modal';
 import Head from './Head';
 import Error from './Error';
 
-const IconDetail = ({ children, invoiceId, action, voucher }) => {
+const ButtonDetail = ({ children, invoiceId, action, voucher }) => {
   const [ openModal, setOpenModal ] = useState(false);
   const [ dataProductInvoice, setDataProductInvoice ] = useState([]);
   const [ dataProducts, setDataProduct ] = useState([]);
@@ -20,7 +20,7 @@ const IconDetail = ({ children, invoiceId, action, voucher }) => {
 
   const getProductsInvoice = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/invoice-product/${invoiceId}`);
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoice-product/${invoiceId}`);
       const data = await response.json();
       setDataProductInvoice(data.data);
     } catch (error) {
@@ -29,7 +29,7 @@ const IconDetail = ({ children, invoiceId, action, voucher }) => {
   };
   const getProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3001/product");
+      const response = await fetch("https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/products");
       const data = await response.json();
       setDataProduct(data.data);
     } catch (error) {
@@ -100,4 +100,4 @@ const IconDetail = ({ children, invoiceId, action, voucher }) => {
   )
 }
 
-export default IconDetail
+export default ButtonDetail

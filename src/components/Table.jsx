@@ -3,7 +3,7 @@ import Error from './Error';
 import Loading from './Loading';
 import Head from './Head';
 import Pagination from './Pagination';
-import Button from './Button';
+import ModalNewInvoice from './ModalNewInvoice';
 import { useAuth } from '../context/auth';
 import { Cookies } from "react-cookie";
 
@@ -18,6 +18,7 @@ const Table = () => {
   const [ data , setData ] = useState([]);
   const [ dataCompleted , setDataCompleted ] = useState([]);
   const [ error, setError ] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { user } = useAuth();
 
@@ -58,9 +59,9 @@ const Table = () => {
   const fetchInvoices = () => {
     let url;
     if(user.role_id === 1){
-      url = "http://localhost:3001/invoice";
+      url = "https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices";
     }else{
-      url = `http://localhost:3001/invoice/${user.client_id}`
+      url = `https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices/${user.client_id}`
     }
     fetch(url,{
     headers: {
@@ -73,12 +74,19 @@ const Table = () => {
       const currentItems = res.data.slice(0, 10);
       setData(currentItems);
     })
-    .catch(error => setError(error))  
+    .catch(error => {
+      setError(error)
+      if (error?.response?.status === 401) {
+        cookies.remove("token");
+        cookies.remove("user");
+        document.location.href="/";
+      }
+    })  
   };
 
   const fetchClient = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/client`);
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/clients`);
       const data = await response.json();
       setClients(data.data);
     } catch (error) {
@@ -88,7 +96,7 @@ const Table = () => {
   };
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/product`);
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/products`);
       const data = await response.json();
       setProducts(data.data);
     } catch (error) {
@@ -109,14 +117,18 @@ const Table = () => {
   if( error ) return < Error error={ error }/>
 
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-[700px] lg:max-h-[800px]">
 
       {
         user.role_id === 1 &&
-        <Button
+        <ModalNewInvoice
+          dataInvoices = {dataCompleted}
           dataClients={clients}
           dataProducts={products}
           functionValidateSales={validateSales}
+          functionDataCompleted = {setDataCompleted}
+          functionDataShowCurrent = {setData}
+          functionCurrentPage = {setCurrentPage}
         />
       }
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -130,10 +142,10 @@ const Table = () => {
         <tbody>
           {
             data?.map(invoice => {
-              const client = clients.find(cli => cli.id === invoice.client_id)?.contact_name;
+              const client = clients.find(cli => cli.id === invoice.client_id)?.name;
               const newInvoice = {...invoice, client }
               return (
-                <Suspense fallback={<Loading cells = {itemsHeadTable}/>}>
+                <Suspense key={invoice.id} fallback={<Loading cells = {itemsHeadTable}/>}>
                   <Row key={invoice.id} {...newInvoice }/>
                 </Suspense>
               )
@@ -141,7 +153,18 @@ const Table = () => {
           }
         </tbody>
       </table>
-      <Pagination totalData={dataCompleted} setData={setData}/>
+      {
+        dataCompleted.length > 0 &&
+        (
+          <Pagination 
+            totalData={dataCompleted} 
+            setData={setData}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            dataCurrentShow = {data}
+          />
+        )
+      }
     </div>
   )
 }

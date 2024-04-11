@@ -13,13 +13,9 @@ const Login = () => {
 
   const successfullLogin = async ( token, user ) => {
 
-    let fecha = new Date();
-    let tokenExpire = 0;
-    fecha.getUTCHours() < 8
-      ? (tokenExpire = (8 - fecha.getUTCHours()) * 60 * 60)
-      : (tokenExpire = (32 - fecha.getUTCHours()) * 60 * 60);
-    setCookies("token", token, { maxAge: tokenExpire, sameSite: 'None', secure: true });
-    setCookies("user", user, { maxAge: tokenExpire, sameSite: 'None', secure: true });
+    
+    setCookies("token", token, { maxAge: 3600, sameSite: 'None', secure: true });
+    setCookies("user", user, { maxAge: 3600, sameSite: 'None', secure: true });
     setAuthToken(token);
     setUser(user);
 
@@ -41,7 +37,7 @@ const Login = () => {
           username: username,
           password: password
       };
-      const response = await fetch("http://localhost:3001/auth/sign-in",
+      const response = await fetch("https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/auth/sign-in",
       {
         method: 'POST',
         headers: {

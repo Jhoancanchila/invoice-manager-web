@@ -7,7 +7,16 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import Swal from 'sweetalert2';
 
 
-const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
+const ModalNewInvoice = ({ 
+  dataClients, 
+  dataProducts, 
+  functionValidateSales, 
+  dataInvoices, 
+  functionDataCompleted, 
+  functionDataShowCurrent, 
+  functionCurrentPage
+}) => {
+
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
   const [disableInputDiscount, setDisableInputDiscount] = useState(functionValidateSales(dataClients[0]?.id));
@@ -25,7 +34,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
 
   const itemsHeadTable = ["Product ID", "Quantity", "Product Name"];
 
-  
+
   const handleImageCapture = (e) => {
     const file = e.target.files[0];
 
@@ -37,32 +46,34 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
         setPreviewUrl(url);
       }
     }
-   };
+  };
 
-  const handleUploadImage = async( idInvoice ) => {
-   
+  const handleUploadImage = async ( idInvoice ) => {
+
     let voucher = new FormData();
     voucher.append("image", uploadedImg);
     voucher.append("idInvoice", idInvoice);
- 
-     await fetch('http://localhost:3001/upload-image', {
-       method: 'POST',
-       body: voucher
-     })
-     .then(res => {
-       if (res.ok) {
+
+    return new Promise(async ( resolve, reject ) => {
+
+      try {
+        
+        const response = await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/upload-image', {
+          method: 'POST',
+          body: voucher
+        });
+
+        if(response.status === 200){
           setUploadedImg("");
           setPreviewUrl("");
-         return res.json();
-       } else {
-         throw new Error('Image upload failed!');
-       }
-     })
-     .catch(error => {
-       throw error;
-     });
-    
-   };
+        };
+        resolve(response);
+
+      } catch (error) {
+        reject(error.response || error);
+      };
+    });
+  };
 
   const addNewInvoice = () => {
     setInitialStateForm(
@@ -132,12 +143,23 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
     return `${year}-${month}-${day}`;
   };
 
+  const pageChange = ( dataCompleted ) => {
+    const totalPages = Math.ceil(dataCompleted.length / 10);
+    functionDataCompleted(dataCompleted);
+    functionCurrentPage(totalPages);
+    const indexOfLastItem = totalPages * 10;
+    const indexOfFirstItem = indexOfLastItem - 10;
+    const currentItems = dataCompleted.slice(indexOfFirstItem, indexOfLastItem);
+    functionDataShowCurrent(currentItems);
+  };
+
   const AddInvoice = async (object, resetForm) => {
-    if(productsNewInvoice.length === 0){
+    let newDataInvoices = [];
+    if (productsNewInvoice.length === 0) {
       Swal.fire("You have not added products yet!")
-      return;      
+      return;
     };
-    const discount = disableInputDiscount === 0 ? 0 : object.discount;
+    const discount = disableInputDiscount === 0 ? 0 : Number(object.discount);
     const subtotal = totalWithoutDiscount();
     const total = subTotal(subtotal, discount);
 
@@ -156,11 +178,27 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
       body: JSON.stringify(body)
     };
     try {
-      const response = await fetch('http://localhost:3001/invoice', requestOptions);
+      const response = await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices', requestOptions);
       const data = await response.json();
-      const { id } = data.data;
-      console.log(id)
+      const newInvoice = data.data;
       if (response.ok) {
+        if (uploadedImg) {
+          const response = await handleUploadImage(newInvoice[0]?.id);
+          const data = await response.json();
+          if(response.status === 200){
+            const objectNewInvoice = newInvoice[0];
+            let newData = {
+              ...objectNewInvoice,
+              voucher: data.location
+            };
+            newDataInvoices = [...dataInvoices,newData];
+            pageChange(newDataInvoices);
+          };
+        }else{
+          newDataInvoices = [...dataInvoices,newInvoice[0]];
+          pageChange(newDataInvoices);
+        }
+                
         setCurrentClientSelected(dataClients[0]?.id);
         setProductsNewInvoice([]);
         resetForm();
@@ -169,8 +207,6 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
           icon: "success"
         });
 
-        if(uploadedImg) handleUploadImage();
-        
       } else {
         Swal.fire({
           icon: "error",
@@ -182,6 +218,7 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
       throw error;
     };
   };
+  
   useEffect(() => {
     const clientId = !currentClientSelected ? dataClients[0]?.id : currentClientSelected;
     const value = functionValidateSales(clientId);
@@ -217,16 +254,9 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                   validate={values => {
                     setCurrentClientSelected(Number(values.client));
                     let errors = {};
-                    if (values.discount < 0) {
-                      errors.discount = 'The discount must be positive!';
-                    }else if(/[a-zA-Z]/.test(values.discount)){
-                      errors.discount = 'Enter a valid value!';
-                    }
-                    else {
-                      if (values.discount > disableInputDiscount) {
-                        if (disableInputDiscount === 0) setDisableInputDiscount(0);
-                        else errors.discount = `Up to ${disableInputDiscount}% admitted!`;
-                      }
+                    if (values.discount > disableInputDiscount) {
+                      if (disableInputDiscount === 0) setDisableInputDiscount(0);
+                      else errors.discount = `Up to ${disableInputDiscount}% admitted!`;
                     }
                     return errors;
                   }}
@@ -277,15 +307,16 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
                           <div className="w-full h-24 flex flex-col justify-start">
                             <label htmlFor="Email" className={`${disableInputDiscount === 0 ? 'text-opacity-5' : ''} block text-sm font-medium text-gray-700`}>Discount</label>
                             <Field
-                              type="text"
-                              step="0.01"
+                              type="number"
+                              step="0.1"
+                              min="0" 
+                              max="100"
                               name="discount"
                               className={`mt-1 col-span-1 pl-4 h-12 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm`}
                               placeholder={disableInputDiscount === 0 ? "" : "0%"}
                               disabled={disableInputDiscount === 0}
-                              maxLength={4}
                             />
-                            <ErrorMessage name="discount" component={()=>(<span className='text-red-500 font-thin'>{errors.discount}</span>)}/>
+                            <ErrorMessage name="discount" component={() => (<span className='text-red-500 font-thin'>{errors.discount}</span>)} />
                           </div>
 
                           <div className="h-24 flex flex-col justify-center">
@@ -341,21 +372,24 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
               </div>
             </section>
           </section>
-          <section className="col-span-4 mt-8 lg:mt-0 grid grid-rows-2">
+          <section className="col-span-4 mt-8 lg:mt-0 grid lg:block">
             <section>
-          
-
-            <div className='flex items-center justify-center min-h-36'>
-              <span>
-                <img width={200} height={200}  src={uploadedImg ? previewUrl : "https://placehold.co/600x400/png"} alt="capture" />
-              </span>
-            </div>
-            <div className="flex items-center justify-center ">
-              <input type="file" id="upload-image" name="upload-image" className="hidden" accept="image/*" capture="camera" onChange={handleImageCapture}/>
-              <label htmlFor="upload-image" className="cursor-pointer bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide">
-                <span>Upload image</span>
-              </label>
-            </div>
+              {
+                previewUrl &&
+                (
+                  <div className='flex items-center justify-center min-h-36'>
+                    <span>
+                      <img width={200} height={200} src={uploadedImg ? previewUrl : "https://placehold.co/600x400/png"} alt="capture" />
+                    </span>
+                  </div>
+                )
+              }
+              <div className="flex items-center justify-center ">
+                <input type="file" id="upload-image" name="upload-image" className="hidden" accept="image/*" capture="camera" onChange={handleImageCapture} />
+                <label htmlFor="upload-image" className="cursor-pointer bg-gray-700 text-white px-5 py-3 text-xs font-medium uppercase tracking-wide">
+                  <span>Upload image</span>
+                </label>
+              </div>
             </section>
             <section className='overflow-y-scroll mt-2 lg:mt-0 max-h-40'>
               <table className='mx-auto text-center'>
@@ -394,4 +428,4 @@ const Button = ({ dataClients, dataProducts, functionValidateSales }) => {
   )
 }
 
-export default Button
+export default ModalNewInvoice
