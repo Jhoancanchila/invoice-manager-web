@@ -32,8 +32,8 @@ const Row = ( props ) => {
         <td className="px-6 py-4">
           <ButtonDetail 
             invoiceId={ id } 
-            endpointOne={`http://localhost:3001/api/invoice-product/${id}`}
-            endpointTwo={"http://localhost:3001/api/products"}
+            endpointOne={`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoice-product/${id}`}
+            endpointTwo={"https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/products"}
             action = "products"
           >
             <span className='cursor-pointer'>

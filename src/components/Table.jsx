@@ -59,9 +59,9 @@ const Table = () => {
   const fetchInvoices = () => {
     let url;
     if(user.role_id === 1){
-      url = "http://localhost:3001/api/invoices";
+      url = "https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices";
     }else{
-      url = `http://localhost:3001/api/invoices/${user.client_id}`
+      url = `https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices/${user.client_id}`
     }
     fetch(url,{
     headers: {
@@ -86,7 +86,7 @@ const Table = () => {
 
   const fetchClient = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/clients`);
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/clients`);
       const data = await response.json();
       setClients(data.data);
     } catch (error) {
@@ -96,7 +96,7 @@ const Table = () => {
   };
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/products`);
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/products`);
       const data = await response.json();
       setProducts(data.data);
     } catch (error) {

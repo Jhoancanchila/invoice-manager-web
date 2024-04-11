@@ -54,22 +54,22 @@ const ModalNewInvoice = ({
     voucher.append("image", uploadedImg);
     voucher.append("idInvoice", idInvoice);
 
-    await fetch('http://localhost:3001/api/upload-image', {
+    await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/upload-image', {
       method: 'POST',
       body: voucher
     })
-      .then(res => {
-        if (res.ok) {
-          setUploadedImg("");
-          setPreviewUrl("");
-          return res.json();
-        } else {
-          throw new Error('Image upload failed!');
-        }
-      })
-      .catch(error => {
-        throw error;
-      });
+    .then(res => {
+      if (res.ok) {
+        setUploadedImg("");
+        setPreviewUrl("");
+        return res.json();
+      } else {
+        throw new Error('Image upload failed!');
+      }
+    })
+    .catch(error => {
+      throw error;
+    });
 
   };
 
@@ -175,7 +175,7 @@ const ModalNewInvoice = ({
       body: JSON.stringify(body)
     };
     try {
-      const response = await fetch('http://localhost:3001/api/invoices', requestOptions);
+      const response = await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices', requestOptions);
       const data = await response.json();
       const newInvoice = data.data;
       if (response.ok) {
@@ -191,8 +191,8 @@ const ModalNewInvoice = ({
         });
 
         if (uploadedImg) {
-          await handleUploadImage(newInvoice[0]?.id);
-        }
+          const response = await handleUploadImage(newInvoice[0]?.id);
+        };
 
       } else {
         Swal.fire({
@@ -205,6 +205,7 @@ const ModalNewInvoice = ({
       throw error;
     };
   };
+  
   useEffect(() => {
     const clientId = !currentClientSelected ? dataClients[0]?.id : currentClientSelected;
     const value = functionValidateSales(clientId);

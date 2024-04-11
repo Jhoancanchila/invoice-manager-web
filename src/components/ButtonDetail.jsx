@@ -20,7 +20,7 @@ const ButtonDetail = ({ children, invoiceId, action, voucher }) => {
 
   const getProductsInvoice = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/invoice-product/${invoiceId}`);
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoice-product/${invoiceId}`);
       const data = await response.json();
       setDataProductInvoice(data.data);
     } catch (error) {
@@ -29,7 +29,7 @@ const ButtonDetail = ({ children, invoiceId, action, voucher }) => {
   };
   const getProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/products");
+      const response = await fetch("https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/products");
       const data = await response.json();
       setDataProduct(data.data);
     } catch (error) {
