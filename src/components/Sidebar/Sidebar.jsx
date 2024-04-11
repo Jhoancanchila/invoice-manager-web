@@ -1,16 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { Cookies } from "react-cookie";
 import "./Sidebar.css";
 
 import logo from "../../assets/logo.webp";
+import { useAuth } from "../../context/auth";
+import { useNavigate } from 'react-router-dom';
 const Sidebar = () => {
+
+  let cookies = new Cookies();
+  const navigate = useNavigate();
+  const { setAuthToken, setUser, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [client, setClient] = useState({});
+
+  const { client_id } = user;
+  const logOut = () => {
+
+    cookies.remove("token");
+    cookies.remove("user");
+    setAuthToken(null);
+    setUser(null);
+    navigate('/');
+    
+  };
+
+  const getClient = async() =>{
+    try {
+      const response = await fetch(`https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/clients/${client_id}`);
+      const data = await response.json();
+      const clientFetch = data.data;
+      setClient(clientFetch[0]);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getClient();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
+
   return (
-    <section className="page sidebar-page">
+    <section className="page sidebar-page" style={{background:"#000000"}}>
       <aside className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="inner">
           <header>
             <img width={40} src={logo} alt="logo" />
-            <h2 className="sidebar-title">IAM EDGE APPS</h2>
+            <h2 className="sidebar-title">{client?.name ?? "IAM EDGE APPS"}</h2>
           </header>
           <nav>           
             <div className= {`sidebar-button ${!isOpen ? 'close' : ''}`}>
@@ -19,7 +56,7 @@ const Sidebar = () => {
             </div>
             {
               !isOpen &&
-              <div className={`sidebar-button ${!isOpen ? 'close' : ''}`}>
+              <div className={`sidebar-button ${!isOpen ? 'close' : ''}`} onClick={logOut}>
               <svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 -960 960 960" width="30"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" fill="white"/></svg>
             </div>
             }
@@ -28,7 +65,7 @@ const Sidebar = () => {
         <div className="sidebar-content-button">
           {
             isOpen &&
-            <div className="sidebar-button">
+            <div className="sidebar-button" onClick={logOut}>
               <svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 -960 960 960" width="30"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" fill="white"/></svg>
               <p>Logout</p>
             </div>
@@ -47,8 +84,10 @@ const Sidebar = () => {
       <header className="sidebar-mobile">
         <div className="sidebar-mobile-content">
           <img width={40} src={logo} alt="logo" />
-          <p className="sidebar-mobile-item">Invoices</p>
-          <svg xmlns="http://www.w3.org/2000/svg" className="sidebar-mobile-item" height="30" viewBox="0 -960 960 960" width="30"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" fill="white"/></svg>
+          <p className="sidebar-mobile-item">{client?.name ?? "IAM EDGE APPS"}</p>
+          <span onClick={logOut}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="sidebar-mobile-item" height="30" viewBox="0 -960 960 960" width="30"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" fill="white"/></svg>
+          </span>
         </div>
       </header>
     </section>
