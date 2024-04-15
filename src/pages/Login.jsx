@@ -37,7 +37,7 @@ const Login = () => {
           username: username,
           password: password
       };
-      const response = await fetch("https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/auth/sign-in",
+      const response = await fetch("http://localhost:3001/api/auth/sign-in",
       {
         method: 'POST',
         headers: {
