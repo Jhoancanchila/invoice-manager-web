@@ -6,6 +6,8 @@ import Head from './Head';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Swal from 'sweetalert2';
 
+import { Cookies } from "react-cookie";
+
 
 const ModalNewInvoice = ({ 
   dataClients, 
@@ -16,6 +18,8 @@ const ModalNewInvoice = ({
   functionDataShowCurrent, 
   functionCurrentPage
 }) => {
+
+  const cookies = new Cookies();
 
   const [openModal, setOpenModal] = useState(false);
   const [productsNewInvoice, setProductsNewInvoice] = useState([]);
@@ -33,13 +37,14 @@ const ModalNewInvoice = ({
   );
 
   const itemsHeadTable = ["Product ID", "Quantity", "Product Name"];
+  const token = cookies.get("token");
 
 
   const handleImageCapture = (e) => {
     const file = e.target.files[0];
 
     if (file) {
-      setUploadedImg(file)
+      setUploadedImg(file);
       let file_type = e.target.files[0]?.type.split("/");
       if (file_type[0] === "image") {
         const url = URL.createObjectURL(file);
@@ -58,9 +63,12 @@ const ModalNewInvoice = ({
 
       try {
         
-        const response = await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/upload-image', {
+        const response = await fetch('http://localhost:3001/api/upload-image', {
           method: 'POST',
-          body: voucher
+          body: voucher,
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         });
 
         if(response.status === 200){
@@ -85,13 +93,15 @@ const ModalNewInvoice = ({
       }
     );
     setOpenModal(true);
-  }
+  };
+
   const handleCancel = () => {
     setUploadedImg("");
     setPreviewUrl("");
     setProductsNewInvoice([]);
     setOpenModal(false);
-  }
+  };
+  
   const addProductToInvoice = (productId) => {
     const parseIdProduct = Number(productId);
 
@@ -178,7 +188,7 @@ const ModalNewInvoice = ({
       body: JSON.stringify(body)
     };
     try {
-      const response = await fetch('https://api-invoice-dev-mjzx.3.us-1.fl0.io/api/invoices', requestOptions);
+      const response = await fetch('http://localhost:3001/api/invoices', requestOptions);
       const data = await response.json();
       const newInvoice = data.data;
       if (response.ok) {
